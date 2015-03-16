@@ -20,6 +20,8 @@ public class Pipe extends Scrollable {
 
     private float groundY;
 
+    private boolean isScored = false;
+
     public Pipe(float x, float y, int width, int height, float scrollspeed, float groundY) {
         super(x, y, width, height, scrollspeed);
         r = new Random();
@@ -65,6 +67,15 @@ public class Pipe extends Scrollable {
         super.reset(newX);
         // Change the height to a random number
         height = r.nextInt(90) + 15;
+        isScored = false;
+    }
+
+    public boolean isScored() {
+        return isScored;
+    }
+
+    public void setScored(boolean b) {
+        isScored = b;
     }
 
     public Rectangle getSkullUp() {

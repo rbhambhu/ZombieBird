@@ -20,7 +20,17 @@ public class GameWorld {
 
     private int score = 0;
 
+    public enum GameState {
+        READY, RUNNING, GAMEOVER, HIGHSCORE
+    }
+
+    private GameState currentState;
+
+    public int midPointY;
+
     public GameWorld(int midPointY) {
+        currentState = GameState.READY;
+        this.midPointY = midPointY;
         // Initialize the bird here.
         bird = new Bird(33, midPointY - 5, 17, 12);
 
@@ -30,6 +40,26 @@ public class GameWorld {
     }
 
     public void update(float delta) {
+
+        switch (currentState) {
+            case READY:
+                updateReady(delta);
+                break;
+
+            case RUNNING:
+                updateRunning(delta);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void updateReady(float delta) {
+        // Do nothing for now
+    }
+
+    public void updateRunning(float delta) {
         // Add a delta cap so that if our game takes too long
         // to update, we will not break our collision detection.
 
@@ -50,6 +80,12 @@ public class GameWorld {
             scroller.stop();
             bird.die();
             bird.decelerate();
+            currentState = GameState.GAMEOVER;
+
+            if (score > AssetLoader.getHighScore()) {
+                AssetLoader.setHighScore(score);
+                currentState = GameState.HIGHSCORE;
+            }
         }
     }
 
@@ -68,6 +104,30 @@ public class GameWorld {
 
     public void addScore(int increment) {
         score += increment;
+    }
+
+    public boolean isReady() {
+        return currentState == GameState.READY;
+    }
+
+    public void start() {
+        currentState = GameState.RUNNING;
+    }
+
+    public void restart() {
+        currentState = GameState.READY;
+        score = 0;
+        bird.onRestart(midPointY - 5);
+        scroller.onRestart();
+        currentState = GameState.READY;
+    }
+
+    public boolean isGameOver() {
+        return currentState == GameState.GAMEOVER;
+    }
+
+    public boolean isHighScore() {
+        return currentState == GameState.HIGHSCORE;
     }
 
 }

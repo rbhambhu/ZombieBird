@@ -41,6 +41,31 @@ public class Bird {
 
         // Add scaled velocity to position.
         position.add(velocity.cpy().scl(delta));
+
+        // Rotate counterclockwise
+        if (velocity.y < 0) {
+            rotation -= 600 * delta;
+
+            if (rotation < -20) {
+                rotation = -20;
+            }
+        }
+
+        // Rotate clockwise
+        if (isFalling()) {
+            rotation += 480 * delta;
+            if (rotation > 90) {
+                rotation = 90;
+            }
+        }
+    }
+
+    public boolean isFalling() {
+        return velocity.y > 110;
+    }
+
+    public boolean shouldntFlap() {
+        return velocity.y > 70;
     }
 
     public void onClick() {

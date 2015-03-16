@@ -1,12 +1,11 @@
 package com.bt.gameobjects;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
+import com.bt.zbhelpers.AssetLoader;
 
-/**
- * Created by Xavie_000 on 3/16/2015.
- */
 public class Bird {
+
     private Vector2 position;
     private Vector2 velocity;
     private Vector2 acceleration;
@@ -14,6 +13,8 @@ public class Bird {
     private float rotation;
     private int width;
     private int height;
+
+    private boolean isAlive;
 
     private Circle boundingCircle;
 
@@ -24,31 +25,22 @@ public class Bird {
         velocity = new Vector2(0, 0);
         acceleration = new Vector2(0, 460);
         boundingCircle = new Circle();
+        isAlive = true;
     }
 
     public void update(float delta) {
 
-        /*
-         * So, what is this actually doing?
-         * We multiply acceleration and velocity vectors by delta which is the amount of time that
-         * has passed since the update method was previously called. This will normalize our
-         * movement. We scale the vectors with delta to achieve frame-rate independent movement.
-         */
-
-        // Simulates gravity, add scaled acceleration to velocity.
         velocity.add(acceleration.cpy().scl(delta));
+
+        if (velocity.y > 200) {
+            velocity.y = 200;
+        }
+
+        position.add(velocity.cpy().scl(delta));
 
         // Set the circle's center to be (9, 6) with respect to the bird.
         // Set the circle's radius to be 6.5f;
         boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
-
-        // Max velocity cap.
-        if(velocity.y > 200) {
-            velocity.y = 200;
-        }
-
-        // Add scaled velocity to position.
-        position.add(velocity.cpy().scl(delta));
 
         // Rotate counterclockwise
         if (velocity.y < 0) {
@@ -60,12 +52,14 @@ public class Bird {
         }
 
         // Rotate clockwise
-        if (isFalling()) {
+        if (isFalling() || !isAlive) {
             rotation += 480 * delta;
             if (rotation > 90) {
                 rotation = 90;
             }
+
         }
+
     }
 
     public boolean isFalling() {
@@ -73,11 +67,23 @@ public class Bird {
     }
 
     public boolean shouldntFlap() {
-        return velocity.y > 70;
+        return velocity.y > 70 || !isAlive;
     }
 
     public void onClick() {
-        velocity.y = -140;
+        if (isAlive) {
+            AssetLoader.flap.play();
+            velocity.y = -140;
+        }
+    }
+
+    public void die() {
+        isAlive = false;
+        velocity.y = 0;
+    }
+
+    public void decelerate() {
+        acceleration.y = 0;
     }
 
     public float getX() {
@@ -102,5 +108,9 @@ public class Bird {
 
     public Circle getBoundingCircle() {
         return boundingCircle;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
     }
 }
